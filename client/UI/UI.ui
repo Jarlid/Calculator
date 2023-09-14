@@ -18,6 +18,24 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
+       <widget class="QTextBrowser" name="historyBrowser">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>30</pointsize>
+         </font>
+        </property>
+        <property name="tabStopWidth">
+         <number>80</number>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLineEdit" name="lineEdit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
