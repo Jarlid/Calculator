@@ -1,3 +1,4 @@
 *.sqbpro
 .idea
 */py_log.log
+*/Calculator_DB.db
