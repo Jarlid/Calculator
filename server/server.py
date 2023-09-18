@@ -1,6 +1,6 @@
 import socket
 
-from config import DEFAULT_ADDRESS, MAX_LEN, ENCODING
+from config import DEFAULT_ADDRESS, ENCODING
 from calculator import Calculator, CalculatorException
 
 
@@ -8,9 +8,22 @@ class DummyException(Exception):  # TODO: удалить после добавл
     pass
 
 
+def recv_until_end(connection: socket) -> str:
+    result = ''
+    while True:
+        part = connection.recv(1024).decode(ENCODING)
+        if not part:
+            break
+        result += part
+        if result[-1] == '#':
+            result = result[:-1]
+            break
+    return result
+
+
 def execute_prompt(prompt: str, calculator: Calculator = Calculator()) -> str:
     try:
-        if prompt == '#':
+        if not prompt:
             # TODO: достать историю из БД.
             # load_info()
             return "#"
@@ -35,10 +48,10 @@ def serve(bind=DEFAULT_ADDRESS):
         server.listen()
         connection, _ = server.accept()
 
-        prompt = connection.recv(MAX_LEN).decode(ENCODING)
+        prompt = recv_until_end(connection)
         result = execute_prompt(prompt)
 
-        connection.send(result.encode(ENCODING))
+        connection.sendall(result.encode(ENCODING))
         connection.close()
 
 
