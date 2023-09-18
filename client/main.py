@@ -3,22 +3,16 @@ from PyQt5 import uic
 import socket
 
 import sys
-import os
-from ../config import *
-
-
-PATH_TO_UI = os.path.join('UI', 'UI.ui')
-ACCEPTABLE_SYMBOLS = '0123456789.()+-*/'
+from config import *
 
 
 class MainWindow(QMainWindow):
     def __init__(self, server=DEFAULT_SERVER_ADDRESS):
         super().__init__()
+        self.server = server
         uic.loadUi(PATH_TO_UI, self)
         self._bind_buttons()
         self.lineEdit.textChanged.connect(self.validate_input)
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect(server)
         self.historyBrowser.setText(self.get_history())
     
     def _bind_buttons(self):
@@ -48,8 +42,10 @@ class MainWindow(QMainWindow):
         self.button_enter.clicked.connect(self.calculate)
     
     def get_history(self):
-        s.sendall('#'.encode(ENCODING))
-        data = s.recv(MAX_LEN).decode(ENCODING)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect(self.server)
+            s.sendall('#'.encode(ENCODING))
+            data = s.recv(MAX_MESSAGE_LEN).decode(ENCODING)
         return data
     
     def validate_input(self, input_expression):
@@ -60,8 +56,10 @@ class MainWindow(QMainWindow):
     
     def calculate(self):
         expression = self.lineEdit.text()
-        s.sendall(expression.encode(ENCODING))
-        result = s.recv(MAX_LEN).decode(ENCODING)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect(self.server)
+            s.sendall(expression.encode(ENCODING))
+            result = s.recv(MAX_MESSAGE_LEN).decode(ENCODING)
         self.lineEdit.setText(result)
         self.historyBrowser.setText(f'{self.historyBrowser.toPlainText()}\n{expression}={result}')
 
