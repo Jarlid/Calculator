@@ -5,7 +5,7 @@ import socket
 import sys
 import os
 
-from utils import receive_all_data_from_socket
+from utils import recv_until_closed
 
 
 PATH_TO_UI = os.path.join('UI', 'UI.ui')
@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect(self.server_address)
             sock.sendall('#'.encode(ENCODING))
-            data = receive_all_data_from_socket(sock).decode(ENCODING)
+            data = recv_until_closed(sock).decode(ENCODING)
         return data
     
     def validate_input(self, input_expression):
@@ -68,10 +68,12 @@ class MainWindow(QMainWindow):
     
     def calculate(self):
         expression = self.lineEdit.text()
+        if not expression:
+            return
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect(self.server_address)
-            sock.sendall(expression.encode(ENCODING))
-            result = receive_all_data_from_socket(sock).decode(ENCODING)
+            sock.sendall((expression + '#').encode(ENCODING))
+            result = recv_until_closed(sock).decode(ENCODING)
         self.lineEdit.setText(result)
         self.historyBrowser.setText(f'{self.historyBrowser.toPlainText()}\n{expression}={result}')
 
