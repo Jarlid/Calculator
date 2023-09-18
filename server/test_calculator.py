@@ -21,6 +21,18 @@ def test_numbers(calculator):
     with pytest.raises(CalculatorException):
         calculator.calculate('.')
 
+    assert calculator.calculate('5e2') == 500.0
+    assert calculator.calculate('5.e2') == 500.0
+    assert calculator.calculate('.5e2') == 50.0
+    with pytest.raises(CalculatorException):
+        calculator.calculate('.e2')
+
+    assert calculator.calculate('5.5e2') == 550.0
+    assert calculator.calculate('5.5e-2') == 0.055
+    assert calculator.calculate('55.5e-2') == 0.555
+    with pytest.raises(CalculatorException):
+        calculator.calculate('5.5e')
+
     with pytest.raises(CalculatorException):
         calculator.calculate('sus')
 
@@ -40,6 +52,8 @@ def test_basic(calculator):
     assert abs(calculator.calculate('-2.5 * 2.5') + 6.25) < EPSILON
     assert abs(calculator.calculate('5 / 5') - 1) < EPSILON
     assert abs(calculator.calculate('-6 / 2.5') + 2.4) < EPSILON
+    with pytest.raises(CalculatorException):
+        calculator.calculate('5 / 0')
 
     assert calculator.calculate('5 * 5 + 5') == 30
     assert calculator.calculate('5 + 5 * 5') == 30
@@ -52,4 +66,6 @@ def test_basic(calculator):
 def test_brackets(calculator):
     assert calculator.calculate('5 + (-5)') == 0
     assert calculator.calculate('5 * (5 + 5)') == 50
+    with pytest.raises(CalculatorException):
+        calculator.calculate('5 / (5 - 5)')
     assert abs(calculator.calculate('(12 + 22*7) / (33 + (12*3 -8)) * 3') - 8.1639344262) < EPSILON
