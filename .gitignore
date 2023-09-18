@@ -2,3 +2,4 @@
 .idea
 */py_log.log
 */Calculator_DB.db
+__pycache__
