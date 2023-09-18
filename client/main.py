@@ -1,15 +1,15 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5 import uic
-import socket
 
+import socket
 import sys
 from config import *
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, server=DEFAULT_SERVER_ADDRESS):
+    def __init__(self, server_address=DEFAULT_SERVER_ADDRESS):
         super().__init__()
-        self.server = server
+        self.server_address = server_address
         uic.loadUi(PATH_TO_UI, self)
         self._bind_buttons()
         self.lineEdit.textChanged.connect(self.validate_input)
@@ -42,10 +42,10 @@ class MainWindow(QMainWindow):
         self.button_enter.clicked.connect(self.calculate)
     
     def get_history(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect(self.server)
-            s.sendall('#'.encode(ENCODING))
-            data = s.recv(MAX_MESSAGE_LEN).decode(ENCODING)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.connect(self.server_address)
+            sock.sendall('#'.encode(ENCODING))
+            data = sock.recv(MAX_MESSAGE_LEN).decode(ENCODING)
         return data
     
     def validate_input(self, input_expression):
@@ -56,10 +56,10 @@ class MainWindow(QMainWindow):
     
     def calculate(self):
         expression = self.lineEdit.text()
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect(self.server)
-            s.sendall(expression.encode(ENCODING))
-            result = s.recv(MAX_MESSAGE_LEN).decode(ENCODING)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.connect(self.server_address)
+            sock.sendall(expression.encode(ENCODING))
+            result = sock.recv(MAX_MESSAGE_LEN).decode(ENCODING)
         self.lineEdit.setText(result)
         self.historyBrowser.setText(f'{self.historyBrowser.toPlainText()}\n{expression}={result}')
 
