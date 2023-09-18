@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5 import uic
+import socket
 
 import sys
 import os
+from ../config import *
 
 
 PATH_TO_UI = os.path.join('UI', 'UI.ui')
@@ -10,11 +12,14 @@ ACCEPTABLE_SYMBOLS = '0123456789.()+-*/'
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, server=DEFAULT_SERVER_ADDRESS):
         super().__init__()
         uic.loadUi(PATH_TO_UI, self)
         self._bind_buttons()
         self.lineEdit.textChanged.connect(self.validate_input)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect(server)
+        self.historyBrowser.setText(self.get_history())
     
     def _bind_buttons(self):
         def write_symbol_on_lineEdit(symbol):
@@ -42,6 +47,11 @@ class MainWindow(QMainWindow):
         self.button_C.clicked.connect(lambda _: self.lineEdit.setText(''))
         self.button_enter.clicked.connect(self.calculate)
     
+    def get_history(self):
+        s.sendall('#'.encode(ENCODING))
+        data = s.recv(MAX_LEN).decode(ENCODING)
+        return data
+    
     def validate_input(self, input_expression):
         if all(symbol in ACCEPTABLE_SYMBOLS for symbol in input_expression):
             return
@@ -50,7 +60,8 @@ class MainWindow(QMainWindow):
     
     def calculate(self):
         expression = self.lineEdit.text()
-        result = '42' # TODO Подтягивать с сервера
+        s.sendall(expression.encode(ENCODING))
+        result = s.recv(MAX_LEN).decode(ENCODING)
         self.lineEdit.setText(result)
         self.historyBrowser.setText(f'{self.historyBrowser.toPlainText()}\n{expression}={result}')
 
