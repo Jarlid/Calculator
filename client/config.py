@@ -1,11 +1,2 @@
 import os
 
-PATH_TO_UI = os.path.join('UI', 'UI.ui')
-ACCEPTABLE_SYMBOLS = '0123456789.()+-*/e'
-
-PORT = 6666
-IP = '127.0.0.1'
-DEFAULT_SERVER_ADDRESS = (IP, PORT)
-
-MAX_MESSAGE_LEN = 1024
-ENCODING = 'ascii'

@@ -3,7 +3,19 @@ from PyQt5 import uic
 
 import socket
 import sys
-from config import *
+import os
+
+from utils import receive_all_data_from_socket
+
+
+PATH_TO_UI = os.path.join('UI', 'UI.ui')
+ACCEPTABLE_SYMBOLS = '0123456789.()+-*/e'
+
+PORT = 6666
+IP = '127.0.0.1'
+DEFAULT_SERVER_ADDRESS = (IP, PORT)
+
+ENCODING = 'ascii'
 
 
 class MainWindow(QMainWindow):
@@ -45,7 +57,7 @@ class MainWindow(QMainWindow):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect(self.server_address)
             sock.sendall('#'.encode(ENCODING))
-            data = sock.recv(MAX_MESSAGE_LEN).decode(ENCODING)
+            data = receive_all_data_from_socket(sock).decode(ENCODING)
         return data
     
     def validate_input(self, input_expression):
@@ -59,7 +71,7 @@ class MainWindow(QMainWindow):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect(self.server_address)
             sock.sendall(expression.encode(ENCODING))
-            result = sock.recv(MAX_MESSAGE_LEN).decode(ENCODING)
+            result = receive_all_data_from_socket(sock).decode(ENCODING)
         self.lineEdit.setText(result)
         self.historyBrowser.setText(f'{self.historyBrowser.toPlainText()}\n{expression}={result}')
 
