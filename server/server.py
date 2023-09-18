@@ -1,7 +1,7 @@
 import socket
 
 from config import DEFAULT_ADDRESS, MAX_LEN, ENCODING
-from calculator import Calculator
+from calculator import Calculator, CalculatorException
 
 
 def serve(bind=DEFAULT_ADDRESS):
@@ -15,9 +15,11 @@ def serve(bind=DEFAULT_ADDRESS):
         connection, _ = server.accept()
 
         prompt = connection.recv(MAX_LEN).decode(ENCODING)
-        result = calculator.calculate(prompt)
-
-        connection.send(str(result).encode(ENCODING))
+        try:
+            result = calculator.calculate(prompt)
+            connection.send(str(result).encode(ENCODING))
+        except CalculatorException as e:
+            connection.send(('#' + str(e)).encode(ENCODING))
         connection.close()
 
 
