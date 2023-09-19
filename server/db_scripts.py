@@ -1,5 +1,8 @@
 import sqlite3 as sql
-from db_config import *
+from datetime import datetime
+import logging
+from db_config import DB_NAME, TABLE_NAME, LOG_FILE_NAME, BASIC_LEVEL_OF_LOGGING, ERROR_MESSAGE, \
+    CONNECTION_TO_SQLITE_CLOSED, CONNECTION_TO_SQLITE_OPENED, TABLE_SQLITE_CREATED, SUCC_SELECT, SUCC_INSERT
 
 
 def add_info(calc, res):
@@ -7,19 +10,19 @@ def add_info(calc, res):
     try:
         sqlite_connection = sql.connect(DB_NAME)
         cursor = sqlite_connection.cursor()
-        logging.info(CONNECTION_TO_SQLITE_OPENED)
+        logging.info(CONNECTION_TO_SQLITE_OPENED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
         execution = f''' INSERT INTO {TABLE_NAME}(Calculation, Result) VALUES (?, ?) '''
         cursor.execute(execution, (calc, res))
         sqlite_connection.commit()
-        logging.info(SUCC_INSERT)
+        logging.info(SUCC_INSERT.format(time=datetime.utcnow().strftime('%H:%M:%S')))
         cursor.close()
     except sql.Error as error:
-        logging.error(ERROR_MESSAGE + repr(error))
+        logging.error(ERROR_MESSAGE.format(time=datetime.utcnow().strftime('%H:%M:%S')) + repr(error))
         raise
     finally:
         if (sqlite_connection):
             sqlite_connection.close()
-            logging.info(CONNECTION_TO_SQLITE_CLOSED)
+            logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
 
 
 def load_info() -> str:
@@ -28,22 +31,22 @@ def load_info() -> str:
     try:
         sqlite_connection = sql.connect(DB_NAME)
         cursor = sqlite_connection.cursor()
-        logging.info(CONNECTION_TO_SQLITE_OPENED)
+        logging.info(CONNECTION_TO_SQLITE_OPENED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
         execution = f''' SELECT * FROM {TABLE_NAME} '''
         cursor.execute(execution)
         rows = cursor.fetchall()
         sqlite_connection.commit()
-        logging.info(SUCC_SELECT)
+        logging.info(SUCC_SELECT.format(time=datetime.utcnow().strftime('%H:%M:%S')))
         cursor.close()
         rows = '$'.join(map(lambda x: x[1] + '$' + x[2], rows))
         return rows
     except sql.Error as error:
-        logging.error(ERROR_MESSAGE + repr(error))
+        logging.error(ERROR_MESSAGE.format(time=datetime.utcnow().strftime('%H:%M:%S')) + repr(error))
         raise
     finally:
         if (sqlite_connection):
             sqlite_connection.close()
-            logging.info(CONNECTION_TO_SQLITE_CLOSED)
+            logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
 
 
 def create_db():
@@ -56,16 +59,15 @@ def create_db():
                                         Result TEXT NOT NULL
                                         ); '''
         cursor = sqlite_connection.cursor()
-        logging.info(CONNECTION_TO_SQLITE_OPENED)
+        logging.info(CONNECTION_TO_SQLITE_OPENED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
         cursor.execute(sqlite_create_table_query)
         sqlite_connection.commit()
-        logging.info(TABLE_SQLITE_CREATED)
+        logging.info(TABLE_SQLITE_CREATED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
 
     except sql.Error as error:
-        logging.error(ERROR_MESSAGE + repr(error))
+        logging.error(ERROR_MESSAGE.format(time=datetime.utcnow().strftime('%H:%M:%S')) + repr(error))
         raise
     finally:
         if (sqlite_connection):
             sqlite_connection.close()
-            logging.info(CONNECTION_TO_SQLITE_CLOSED)
-
+            logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
