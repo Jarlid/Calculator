@@ -4,6 +4,7 @@ import ply.yacc as yacc
 tokens = (
     'NUMBER',
     'FLOAT',
+    'EFLOAT',
     'PLUS',
     'MINUS',
     'TIMES',
@@ -24,6 +25,14 @@ def create_lexer():
     t_DIVIDE = r'/'
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
+
+    @lex.TOKEN(r'\d*\.?\d*e-?\d*')
+    def t_EFLOAT(t):
+        try:
+            t.value = float(t.value)
+            return t
+        except ValueError:
+            raise CalculatorException(f"Incorrect format for exponential notation.")
 
     @lex.TOKEN(r'\d*\.\d*')
     def t_FLOAT(t):
@@ -70,7 +79,10 @@ class Calculator:
 
         def p_term_div(p):
             """term : term DIVIDE factor"""
-            p[0] = p[1] / p[3]
+            try:
+                p[0] = p[1] / p[3]
+            except ZeroDivisionError:
+                raise CalculatorException("Division by zero occurred.")
 
         def p_term_factor(p):
             """term : factor"""
@@ -78,7 +90,8 @@ class Calculator:
 
         def p_factor_num(p):
             """factor : NUMBER
-                      | FLOAT"""
+                      | FLOAT
+                      | EFLOAT"""
             p[0] = p[1]
 
         def p_factor_expr(p):
