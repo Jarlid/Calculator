@@ -58,7 +58,11 @@ class MainWindow(QMainWindow):
             sock.connect(self.server_address)
             sock.sendall('#'.encode(ENCODING))
             data = recv_until_closed(sock).decode(ENCODING)
-        return data
+            data = data.split('$')
+            result = []
+            for i in range(0, len(data), 2):
+                result.append(f'{data[i]}={data[i+1]}')
+        return '\n'.join(result)
     
     def validate_input(self, input_expression):
         if all(symbol in ACCEPTABLE_SYMBOLS for symbol in input_expression):
