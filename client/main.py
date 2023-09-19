@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt5 import uic
 
 import socket
@@ -74,6 +74,12 @@ class MainWindow(QMainWindow):
             sock.connect(self.server_address)
             sock.sendall((expression + '#').encode(ENCODING))
             result = recv_until_closed(sock).decode(ENCODING)
+        if result.startswith('#'):
+            error_msg = QMessageBox()
+            error_msg.setWindowTitle('Error!')
+            error_msg.setText(result[1:].strip())
+            error_msg.exec_()
+            return
         self.lineEdit.setText(result)
         self.historyBrowser.setText(f'{self.historyBrowser.toPlainText()}\n{expression}={result}')
 
