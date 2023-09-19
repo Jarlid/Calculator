@@ -1,0 +1,5 @@
+*.sqbpro
+.idea
+*/py_log.log
+*/calculator_db.db
+__pycache__
