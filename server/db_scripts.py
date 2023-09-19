@@ -5,6 +5,11 @@ from db_config import DB_NAME, TABLE_NAME, LOG_FILE_NAME, BASIC_LEVEL_OF_LOGGING
     CONNECTION_TO_SQLITE_CLOSED, CONNECTION_TO_SQLITE_OPENED, TABLE_SQLITE_CREATED, SUCC_SELECT, SUCC_INSERT
 
 
+class db_exception(Exception):
+    """Throwing errors with db outside"""
+    pass
+
+
 def add_info(calc, res):
     logging.basicConfig(level=BASIC_LEVEL_OF_LOGGING, filename=LOG_FILE_NAME, filemode='a')
     try:
@@ -21,7 +26,7 @@ def add_info(calc, res):
         if (sqlite_connection):
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
-        raise Exception("Can't insert into the db, " + repr(error))
+        raise db_exception("Can't insert into the db, " + repr(error))
     finally:
         if (sqlite_connection):
             sqlite_connection.close()
@@ -48,7 +53,7 @@ def load_info() -> str:
         if (sqlite_connection):
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
-        raise Exception("Can't load from the db, " + repr(error))
+        raise db_exception("Can't load from the db, " + repr(error))
     finally:
         if (sqlite_connection):
             sqlite_connection.close()
@@ -75,7 +80,7 @@ def create_db():
         if (sqlite_connection):
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
-        raise Exception("Can't create a db, " + repr(error))
+        raise db_exception("Can't create a db, " + repr(error))
     finally:
         if (sqlite_connection):
             sqlite_connection.close()
