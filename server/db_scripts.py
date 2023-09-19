@@ -12,6 +12,7 @@ class DBException(Exception):
 
 def add_info(calc, res):
     logging.basicConfig(level=BASIC_LEVEL_OF_LOGGING, filename=LOG_FILE_NAME, filemode='a')
+    sqlite_connection = None
     try:
         sqlite_connection = sql.connect(DB_NAME)
         cursor = sqlite_connection.cursor()
@@ -23,12 +24,12 @@ def add_info(calc, res):
         cursor.close()
     except sql.Error as error:
         logging.error(ERROR_MESSAGE.format(time=datetime.utcnow().strftime('%H:%M:%S')) + repr(error))
-        if (sqlite_connection):
+        if sqlite_connection:
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
         raise DBException("Can't insert into the db, " + repr(error))
     finally:
-        if (sqlite_connection):
+        if sqlite_connection:
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
 
@@ -36,6 +37,7 @@ def add_info(calc, res):
 def load_info() -> str:
     """Return a string in format [Calculation]$[Result]$[Calculation]$[Result]..."""
     logging.basicConfig(level=BASIC_LEVEL_OF_LOGGING, filename=LOG_FILE_NAME, filemode='a')
+    sqlite_connection = None
     try:
         sqlite_connection = sql.connect(DB_NAME)
         cursor = sqlite_connection.cursor()
@@ -50,18 +52,19 @@ def load_info() -> str:
         return rows
     except sql.Error as error:
         logging.error(ERROR_MESSAGE.format(time=datetime.utcnow().strftime('%H:%M:%S')) + repr(error))
-        if (sqlite_connection):
+        if sqlite_connection:
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
         raise DBException("Can't load from the db, " + repr(error))
     finally:
-        if (sqlite_connection):
+        if sqlite_connection:
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
 
 
 def create_db():
     logging.basicConfig(level=BASIC_LEVEL_OF_LOGGING, filename=LOG_FILE_NAME, filemode='a')
+    sqlite_connection = None
     try:
         sqlite_connection = sql.connect(DB_NAME)
         sqlite_create_table_query = f''' CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
@@ -77,11 +80,11 @@ def create_db():
 
     except sql.Error as error:
         logging.error(ERROR_MESSAGE.format(time=datetime.utcnow().strftime('%H:%M:%S')) + repr(error))
-        if (sqlite_connection):
+        if sqlite_connection:
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))
         raise DBException("Can't create a db, " + repr(error))
     finally:
-        if (sqlite_connection):
+        if sqlite_connection:
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED.format(time=datetime.utcnow().strftime('%H:%M:%S')))

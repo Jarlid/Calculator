@@ -2,10 +2,7 @@ import socket
 
 from config import DEFAULT_ADDRESS, ENCODING
 from calculator import Calculator, CalculatorException
-
-
-class DummyException(Exception):  # TODO: удалить после добавления БД.
-    pass
+from db_scripts import add_info, load_info, create_db, DBException
 
 
 def recv_until_end(connection: socket) -> str:
@@ -24,25 +21,24 @@ def recv_until_end(connection: socket) -> str:
 def execute_prompt(prompt: str, calculator: Calculator = Calculator()) -> str:
     try:
         if not prompt:
-            # TODO: достать историю из БД.
-            # load_info()
-            return "#"
+            return load_info()
 
         result = calculator.calculate(prompt)
-        # TODO: отправить в БД.
-        # add_info(prompt, result)
+        add_info(prompt, result)
         return str(result)
 
     except CalculatorException as e:
         return '#' + str(e)
 
-    except DummyException:  # TODO: заменить DummyException на Exception от БД.
+    except DBException:
         return '#Database error occurred.'
 
 
 def serve(bind=DEFAULT_ADDRESS):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(bind)
+
+    create_db()
 
     while True:
         server.listen()
