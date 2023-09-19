@@ -15,6 +15,7 @@ def add_info(calc, res):
         cursor.close()
     except sql.Error as error:
         logging.error(ERROR_MESSAGE + repr(error))
+        raise
     finally:
         if (sqlite_connection):
             sqlite_connection.close()
@@ -38,6 +39,7 @@ def load_info() -> str:
         return rows
     except sql.Error as error:
         logging.error(ERROR_MESSAGE + repr(error))
+        raise
     finally:
         if (sqlite_connection):
             sqlite_connection.close()
@@ -61,10 +63,9 @@ def create_db():
 
     except sql.Error as error:
         logging.error(ERROR_MESSAGE + repr(error))
+        raise
     finally:
         if (sqlite_connection):
             sqlite_connection.close()
             logging.info(CONNECTION_TO_SQLITE_CLOSED)
-
-
 

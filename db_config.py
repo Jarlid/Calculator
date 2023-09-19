@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 
-DB_NAME = 'Calculator_db.db'
+DB_NAME = 'calculator_db.db'
 TABLE_NAME = 'History'
 LOG_FILE_NAME = 'py_log.log'
 BASIC_LEVEL_OF_LOGGING = logging.INFO
